@@ -1,6 +1,6 @@
 pragma solidity ^0.4.11;
 
-contract SystemeFrance{
+contract SystemeFrancePresidentiel{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
     enum Roles{Simple_citoyen,Conseiller_local,Depute,Senateur,President,Conseiller_constit}
@@ -8,7 +8,7 @@ contract SystemeFrance{
      struct carac_citoyen{
          uint codepostal;
          Roles RoleDuCitoyen;
-        
+         uint numerodistrict;
      } 
    struct election 
 	{
@@ -20,7 +20,15 @@ contract SystemeFrance{
 	} 
 mapping(address => carac_citoyen) citoyens;
 event rolecast(address citoyen, Roles sonrole);
-event cast(uint love);
+///enables a citizen to register himself with its postal code and its number of district
+/// Maybe a register with all the codepostal linked to the number of district could be useful
+///in order to have a more user friendly interface 
+function register(uint codepostal,uint numero_district){
+    citoyens[msg.sender].codepostal=codepostal;
+    citoyens[msg.sender].numerodistrict=numero_district;
+}
+
+
 function affichage_role(address[]citoyen_){
         for (uint256 i;i<citoyen_.length;i++){
             Roles petit=citoyens[citoyen_[i]].RoleDuCitoyen;
@@ -50,6 +58,7 @@ function start_pres_sec_tour(address[]candidats){
 function vote_for_premiertour(address candidat) returns (bool){
       if ((presi_pre_tour.hasVoted[msg.sender]==false) && (presi_pre_tour.isElecting==true)){
           presi_pre_tour.electionResults[candidat]++;
+          presi_pre_tour.hasVoted[msg.sender]=true;
           return true;
          }
     return false;
@@ -98,9 +107,9 @@ function vote_for_secondtour(address candidat) returns (bool){
 }
 
 function get_president_after_second_tour(){
-    
+    address winner;
     if(presi_sec_tour.electionResults[presi_sec_tour.candidateList[0]]>presi_pre_tour.electionResults[presi_sec_tour.candidateList[1]]){
-    address winner=presi_sec_tour.candidateList[0];
+     winner=presi_sec_tour.candidateList[0];
     }
     else winner=presi_sec_tour.candidateList[1];
     
@@ -111,12 +120,7 @@ citoyens[winner].RoleDuCitoyen=Roles.President;
 }
 
 
-mapping(uint=>election ) liste_legislatives; // each election is represented by its number of district from 1 to 577
-/// for one district 
-function start_a_legi(address[]candidats,uint number_district){
-        liste_legislatives[number_district].isElecting=true;
-        for(uint i=0;i<candidats.length;i++) liste_legislatives[number_district].candidateList[i]=candidats[i];
-        liste_legislatives[number_district].nbCandidates=candidats.length;
-    }
+    
+    
+    
 }
-
