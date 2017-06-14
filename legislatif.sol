@@ -3,7 +3,7 @@ pragma solidity ^0.4.11;
 contract SystemeFranceLegislatif{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
-    enum Roles{Simple_citoyen,Conseiller_local,Depute,Senateur,President,Conseiller_constit}
+    enum Roles{Simple_citoyen,PresidentR,Conseiller_local,Depute,PresidentAN,Senateur,PresidentS,Conseiller_constit}
      
      struct carac_citoyen{
          uint codepostal;
@@ -105,6 +105,7 @@ function vote_for_secondtour_legi(address candidat,uint number_district) returns
 
 function get_depute_after_second_tour(uint number_district){
     address winner;
+    liste_legislatives_sec_tour[number_district].isElecting=false;
     if(liste_legislatives_sec_tour[number_district].electionResults[liste_legislatives_sec_tour[number_district].candidateList[0]]>liste_legislatives_sec_tour[number_district].electionResults[liste_legislatives_sec_tour[number_district].candidateList[1]]){
     winner=liste_legislatives_sec_tour[number_district].candidateList[0];
     }
@@ -115,6 +116,95 @@ citoyens[winner].RoleDuCitoyen=Roles.Depute;
 
     
 }
+//////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////Election président Assemblée Nationale/////////////////
 
+/// the President of the National Assembly is elected with absolute majority
+/// if we cant reach absolute majority twice, we must use relative majority
+election presidentAN;
+election presidentAN2;
+election presidentAN3;
+
+function start_president_AN(address[]candidats){
+  presidentAN.isElecting=true;
+        for(uint i=0;i<candidats.length;i++) presidentAN.candidateList[i]=candidats[i];
+        presidentAN.nbCandidates=candidats.length;
+    }
+
+function voteforPresidentAN(address candidat) returns (bool){
+          if ((presidentAN.hasVoted[msg.sender]==false) && (presidentAN.isElecting==true) && (citoyens[msg.sender].RoleDuCitoyen==Roles.Depute)){
+              
+              presidentAN.electionResults[candidat]++;
+              presidentAN.hasVoted[msg.sender]=true;
+              return true;
+          }
+
+    return false ; /// could be intersting to indicate the voter why it failed
+}
+/// gives us the new president of the National Assembly
+function get_Presdepute_normal() returns (address){
+      address winner=presidentAN.candidateList[0];
+        uint256 compteur=presidentAN.electionResults[winner];
+        presidentAN.isElecting=true;
+         for (uint i=1;i<presidentAN.nbCandidates;i++){
+             if (presidentAN.electionResults[presidentAN.candidateList[i]]>presidentAN.electionResults[winner]){
+                 winner=presidentAN.candidateList[i];
+                 
+             }
+             compteur+=presidentAN.electionResults[presidentAN.candidateList[i]];
+         }
+        
+     if (presidentAN.electionResults[winner]>compteur/2) {
+         
+         citoyens[winner].RoleDuCitoyen=Roles.PresidentAN;
+     
+         return winner;
+     }
+     else return 0x0;
+    
+  }
+  
+  /*
+ function start_president_AN2(address[]candidats){
+  presidentAN.isElecting=true;
+        for(uint i=0;i<candidats.length;i++) presidentAN.candidateList[i]=candidats[i];
+        presidentAN.nbCandidates=candidats.length;
+    }
+
+function voteforPresidentAN2(address candidat) returns (bool){
+          if ((presidentAN.hasVoted[msg.sender]==false) && (presidentAN.isElecting==true) && (citoyens[msg.sender].RoleDuCitoyen==Roles.Depute)){
+              
+              presidentAN.electionResults[candidat]++;
+              presidentAN.hasVoted[msg.sender]=true;
+              return true;
+          }
+
+    return false ; /// could be intersting to indicate the voter why it failed
+}
+/// gives us the new president of the National Assembly
+function get_Presdepute_normal2() returns (address){
+      address winner=presidentAN.candidateList[0];
+        uint256 compteur=presidentAN.electionResults[winner];
+        presidentAN.isElecting=true;
+         for (uint i=1;i<presidentAN.nbCandidates;i++){
+             if (presidentAN.electionResults[presidentAN.candidateList[i]]>presidentAN.electionResults[winner]){
+                 winner=presidentAN.candidateList[i];
+                 
+             }
+             compteur+=presidentAN.electionResults[presidentAN.candidateList[i]];
+         }
+        
+     if (presidentAN.electionResults[winner]>compteur/2) {
+         
+         citoyens[winner].RoleDuCitoyen=Roles.PresidentAN;
+     
+         return winner;
+     }
+     else return 0x0;
+    
+  }
+  
+   */
+   
 }
 
