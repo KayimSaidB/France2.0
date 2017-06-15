@@ -20,6 +20,15 @@ contract SystemeFranceSenat{
     
 		mapping (uint => uint256) electionResults;
 	} 
+	 struct election_pdSenat
+	{
+		bool isElecting;
+		uint nbCandidates;
+		mapping (address => bool) hasVoted;
+		mapping (uint => address) candidateList;
+    
+		mapping (address => uint256) electionResults;
+	} 
 mapping(address => carac_citoyen) citoyens;
 event rolecast(address citoyen, Roles sonrole);
 /// vote for the Senat
@@ -158,7 +167,7 @@ function register_proportional(int nombre_depute,uint number_departement)
 {
     //address [nombre_depute] memory candidate;
     
-    address[] memory candidate= new address[nombre_depute];
+  //  address[] memory candidate= new address[nombre_depute];
 }
 function start_a_senat_proportional(address[12][]candidats,uint number_departement){
         liste_senat_proportional[number_departement].isElecting=true;
@@ -171,45 +180,45 @@ function get_senators_after_proportional(){}
 
 //////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////Election président Assemblée Nationale/////////////////
-/*
+
 /// the President of the National Assembly is elected with absolute majority
 /// if we cant reach absolute majority twice, we must use relative majority
-election presidentAN;
-election presidentAN2;
-election presidentAN3;
+election_pdSenat presidentSenat;
+election presidentSenat2;
 
-function start_president_AN(address[]candidats){
-  presidentAN.isElecting=true;
-        for(uint i=0;i<candidats.length;i++) presidentAN.candidateList[i]=candidats[i];
-        presidentAN.nbCandidates=candidats.length;
+
+function start_president_senat(address[]candidats){
+  presidentSenat.isElecting=true;
+        for(uint i=0;i<candidats.length;i++) presidentSenat.candidateList[i]=candidats[i];
+        presidentSenat.nbCandidates=candidats.length;
     }
 
-function voteforPresidentAN(address candidat) returns (bool){
-          if ((presidentAN.hasVoted[msg.sender]==false) && (presidentAN.isElecting==true) && (citoyens[msg.sender].RoleDuCitoyen==Roles.Depute)){
+function voteforpresidentSenat(address candidat) returns (bool){
+          if ((presidentSenat.hasVoted[msg.sender]==false) && (presidentSenat.isElecting==true) && (citoyens[msg.sender].RoleDuCitoyen==Roles.Senateur)){
               
-              presidentAN.electionResults[candidat]++;
-              presidentAN.hasVoted[msg.sender]=true;
+              presidentSenat.electionResults[candidat]++;
+              presidentSenat.hasVoted[msg.sender]=true;
               return true;
           }
 
     return false ; /// could be intersting to indicate the voter why it failed
 }
 /// gives us the new president of the National Assembly
-function get_Presdepute_normal() returns (address){
-      address winner=presidentAN.candidateList[0];
-        uint256 compteur=presidentAN.electionResults[winner];
-        presidentAN.isElecting=true;
-         for (uint i=1;i<presidentAN.nbCandidates;i++){
-             if (presidentAN.electionResults[presidentAN.candidateList[i]]>presidentAN.electionResults[winner]){
-                 winner=presidentAN.candidateList[i];
+function get_PresSenateur_normal() returns (address){
+      address winner=presidentSenat.candidateList[0];
+        uint256 compteur=presidentSenat.electionResults[winner];
+        presidentSenat.isElecting=true;
+         for (uint i=1;i<presidentSenat.nbCandidates;i++){
+             if (presidentSenat.electionResults[presidentSenat.candidateList[i]]>presidentSenat.electionResults[winner]){
+                 winner=presidentSenat.candidateList[i];
                  
              }
-             compteur+=presidentAN.electionResults[presidentAN.candidateList[i]];
+             compteur+=presidentSenat.electionResults[presidentSenat.candidateList[i]];
          }
         
-     if (presidentAN.electionResults[winner]>compteur/2) {
+     if (presidentSenat.electionResults[winner]>compteur/2) {
          
-         citoyens[winner].RoleDuCitoyen=Roles.PresidentAN;
+         citoyens[winner].RoleDuCitoyen=Roles.PresidentS;
      
          return winner;
      }
@@ -218,38 +227,38 @@ function get_Presdepute_normal() returns (address){
   }
   
   /*
- function start_president_AN2(address[]candidats){
-  presidentAN.isElecting=true;
-        for(uint i=0;i<candidats.length;i++) presidentAN.candidateList[i]=candidats[i];
-        presidentAN.nbCandidates=candidats.length;
+ function start_president_senat2(address[]candidats){
+  presidentSenat2.isElecting=true;
+        for(uint i=0;i<candidats.length;i++) presidentSenat2.candidateList[i]=candidats[i];
+        presidentSenat2.nbCandidates=candidats.length;
     }
 
-function voteforPresidentAN2(address candidat) returns (bool){
-          if ((presidentAN.hasVoted[msg.sender]==false) && (presidentAN.isElecting==true) && (citoyens[msg.sender].RoleDuCitoyen==Roles.Depute)){
+function voteforpresidentSenat2(address candidat) returns (bool){
+          if ((presidentSenat2.hasVoted[msg.sender]==false) && (presidentSenat2.isElecting==true) && (citoyens[msg.sender].RoleDuCitoyen==Roles.Senateur)){
               
-              presidentAN.electionResults[candidat]++;
-              presidentAN.hasVoted[msg.sender]=true;
+              presidentSenat2.electionResults[candidat]++;
+              presidentSenat2.hasVoted[msg.sender]=true;
               return true;
           }
 
     return false ; /// could be intersting to indicate the voter why it failed
 }
 /// gives us the new president of the National Assembly
-function get_Presdepute_normal2() returns (address){
-      address winner=presidentAN.candidateList[0];
-        uint256 compteur=presidentAN.electionResults[winner];
-        presidentAN.isElecting=true;
-         for (uint i=1;i<presidentAN.nbCandidates;i++){
-             if (presidentAN.electionResults[presidentAN.candidateList[i]]>presidentAN.electionResults[winner]){
-                 winner=presidentAN.candidateList[i];
+function get_PresSenateur_normal2() returns (address){
+      address winner=presidentSenat2.candidateList[0];
+        uint256 compteur=presidentSenat2.electionResults[winner];
+        presidentSenat2.isElecting=true;
+         for (uint i=1;i<presidentSenat2.nbCandidates;i++){
+             if (presidentSenat2.electionResults[presidentSenat2.candidateList[i]]>presidentSenat.electionResults[winner]){
+                 winner=presidentSenat.candidateList[i];
                  
              }
-             compteur+=presidentAN.electionResults[presidentAN.candidateList[i]];
+             compteur+=presidentSenat.electionResults[presidentSenat.candidateList[i]];
          }
         
-     if (presidentAN.electionResults[winner]>compteur/2) {
+     if (presidentSenat.electionResults[winner]>compteur/2) {
          
-         citoyens[winner].RoleDuCitoyen=Roles.PresidentAN;
+         citoyens[winner].RoleDuCitoyen=Roles.PresidentSenat;
      
          return winner;
      }
@@ -257,8 +266,8 @@ function get_Presdepute_normal2() returns (address){
     
   }
   
+   
    */
    
 }
-
 
