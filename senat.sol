@@ -156,30 +156,68 @@ function get_senators_after_second_tour(uint number_departement){
 		uint nbCandidates;
 		mapping (address => bool) hasVoted;
 		mapping (uint => address[]) candidateList;
-    
+        uint nbcandidatesbylist;
 		mapping (uint => uint256) electionResults;
+		uint compteurvoix;
+		mapping(uint =>uint) indicesenateur;/// a mapping of index to each list of candidate which indicate which index of the list has to be chosen 
 	} 
 
 mapping (uint=>election_proportional) liste_senat_proportional;
 /// set to the maximal senators 
-
-function register_proportional(int nombre_depute,uint number_departement)
-{
-    //address [nombre_depute] memory candidate;
-    
-  //  address[] memory candidate= new address[nombre_depute];
+/*function show_me(uint number_departement){
+    for(uint i=0;i<liste_senat_proportional[number_departement].nbCandidates;i++) cast3(liste_senat_proportional[number_departement].candidateList[i]);
 }
-function start_a_senat_proportional(address[12][]candidats,uint number_departement){
+*/
+// when all list initalized we can start the proportional ballot
+function start_a_proportional(uint number_departement){
         liste_senat_proportional[number_departement].isElecting=true;
-        for(uint i=0;i<candidats.length;i++) liste_senat_proportional[number_departement].candidateList[i]=candidats[i];
-        liste_senat_pre_tour[number_departement].nbCandidates=candidats.length;
-    }
+        liste_senat_proportional[number_departement].nbcandidatesbylist=liste_senat_proportional[number_departement].candidateList[0].length;
+    
+}
+/// we need to register every list separately 
+function register_a_list_a_senat_proportional(address[]candidats,uint number_departement,uint indicelist){
+         liste_senat_proportional[number_departement].candidateList[indicelist]=candidats;
+    
+       liste_senat_proportional[number_departement].nbCandidates++;
+        
+    
+}
+event cast3(address[]untel);
+function vote_for_a_proportional(uint indice_liste,uint number_departement) returns (bool){
+if ((liste_senat_proportional[number_departement].hasVoted[msg.sender]==false) && (liste_senat_proportional[number_departement].isElecting==true) && (number_departement==citoyens[msg.sender].numberdepartement)){
+          liste_senat_proportional[number_departement].electionResults[indice_liste]++;
+          liste_senat_proportional[number_departement].hasVoted[msg.sender]=true;
+          liste_senat_proportional[number_departement].compteurvoix++;
+          return true;
+         }
+    return false;    
+    
+    
+}
+function get_senators_after_proportional(uint number_departement){
+       uint nombresenateur=liste_senat_proportional[number_departement].nbcandidatesbylist;
+    while(nombresenateur>0){
+        uint senateurwinner=0;
+        for (uint i=0;i<liste_senat_proportional[number_departement].nbCandidates;i++){
+            if (liste_senat_proportional[number_departement].electionResults[senateurwinner]<liste_senat_proportional[number_departement].electionResults[i]) senateurwinner=i;
+        
+            
+        }
+        nombresenateur--;
+        address nouveausenateur=liste_senat_proportional[number_departement].candidateList[senateurwinner][liste_senat_proportional[number_departement].indicesenateur[senateurwinner]];
+        liste_senat_proportional[number_departement].indicesenateur[senateurwinner]++;
+        uint nbdepute_previsonnel=liste_senat_proportional[number_departement].indicesenateur[senateurwinner]+1;
+        liste_senat_proportional[number_departement].electionResults[senateurwinner]=liste_senat_proportional[number_departement].electionResults[senateurwinner]/nbdepute_previsonnel;
 
-
-function get_senators_after_proportional(){}
+        citoyens[nouveausenateur].RoleDuCitoyen=Roles.Senateur;
+        
+    }    
+    
+    
+}
 
 //////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////Election président Assemblée Nationale/////////////////
+////////////////////////////Election président Sénat/////////////////
 
 /// the President of the National Assembly is elected with absolute majority
 /// if we cant reach absolute majority twice, we must use relative majority
