@@ -1,5 +1,5 @@
 pragma solidity ^0.4.11;
-
+/// french senator elections
 contract SystemeFranceSenat{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
@@ -11,24 +11,20 @@ contract SystemeFranceSenat{
          uint numerodistrict;
          uint numberdepartement;
      } 
+     /// Senators election works by voting for list of candidate
+     ///two turn system for departement where we need 1-3 senators
+     /// proportional system when it's over 3
+     /// first structure is for two turn election 
    struct election 
 	{
 		bool isElecting;
 		uint nbCandidates;
 		mapping (address => bool) hasVoted;
-		mapping (uint => address[3]) candidateList;
+		mapping (uint => address[3]) candidateList; /// we set at three but if we want less senators we have to modify here
     
 		mapping (uint => uint256) electionResults;
 	} 
-	 struct election_pdSenat
-	{
-		bool isElecting;
-		uint nbCandidates;
-		mapping (address => bool) hasVoted;
-		mapping (uint => address) candidateList;
-    
-		mapping (address => uint256) electionResults;
-	} 
+
 mapping(address => carac_citoyen) citoyens;
 event rolecast(address citoyen, Roles sonrole);
 /// vote for the Senat
@@ -48,7 +44,6 @@ function affichage_role(address[]citoyen_){
 // each county has a list of Senators 
 // so we create a mapping which links the number of Senators needed 
 /// and the number of a county
-mapping (uint =>uint) departement;
 mapping (uint=>election) liste_senat_pre_tour;
 mapping (uint=>election) liste_senat_sec_tour;
 //number of a county linked to each election case we have to elect a senator in two turn
@@ -68,7 +63,7 @@ function show_me_the_candidates(uint number_departement){
 }
 
 
-
+///we indentify a list by an index to vote
 function vote_for_a_senat_pre_tour(uint indice_liste,uint number_departement) returns (bool){
 if ((liste_senat_pre_tour[number_departement].hasVoted[msg.sender]==false) && (liste_senat_pre_tour[number_departement].isElecting==true) && (number_departement==citoyens[msg.sender].numberdepartement)){
           liste_senat_pre_tour[number_departement].electionResults[indice_liste]++;
@@ -106,7 +101,6 @@ function get_the_two_or_the_one_list(uint number_departement)returns(address[3][
  if (liste_senat_pre_tour[number_departement].electionResults[indicewinner]>compteur/2){ 
      for (uint j=0;j<winner.length;j++)citoyens[winner[j]].RoleDuCitoyen=Roles.Senateur;
      
-     // a modfier selon le nombre de senateur
     vainqueur[0]=winner;
     return vainqueur;
     
@@ -124,7 +118,7 @@ function start_a_senat_sec_tour(address[3][]candidats,uint number_departement){
         for(uint i=0;i<candidats.length;i++) liste_senat_sec_tour[number_departement].candidateList[i]=candidats[i];
         liste_senat_sec_tour[number_departement].nbCandidates=candidats.length;
     }
-
+/// we indentify any list 
 function vote_for_a_senat_sec_tour(uint indice_liste,uint number_departement) returns (bool){
 if ((liste_senat_sec_tour[number_departement].hasVoted[msg.sender]==false) && (liste_senat_sec_tour[number_departement].isElecting==true) && (number_departement==citoyens[msg.sender].numberdepartement)){
           liste_senat_sec_tour[number_departement].electionResults[indice_liste]++;
@@ -136,7 +130,7 @@ if ((liste_senat_sec_tour[number_departement].hasVoted[msg.sender]==false) && (l
     
 }
 
-
+///setting sentors 
 function get_senators_after_second_tour(uint number_departement){
     address [3] memory winner;
     liste_senat_sec_tour[number_departement].isElecting=false;
@@ -149,13 +143,13 @@ function get_senators_after_second_tour(uint number_departement){
 
     
 }
-
+/// the case of proportional election 
    struct election_proportional 
 	{
 		bool isElecting;
 		uint nbCandidates;
 		mapping (address => bool) hasVoted;
-		mapping (uint => address[]) candidateList;
+		mapping (uint => address[]) candidateList;/// we dont know how many candidates have a list
         uint nbcandidatesbylist;
 		mapping (uint => uint256) electionResults;
 		uint compteurvoix;
@@ -174,7 +168,7 @@ function start_a_proportional(uint number_departement){
         liste_senat_proportional[number_departement].nbcandidatesbylist=liste_senat_proportional[number_departement].candidateList[0].length;
     
 }
-/// we need to register every list separately 
+/// we need to register every list separately before starting the proportional
 function register_a_list_a_senat_proportional(address[]candidats,uint number_departement,uint indicelist){
          liste_senat_proportional[number_departement].candidateList[indicelist]=candidats;
     
@@ -183,6 +177,7 @@ function register_a_list_a_senat_proportional(address[]candidats,uint number_dep
     
 }
 event cast3(address[]untel);
+// we indentify a proportional list by an index 
 function vote_for_a_proportional(uint indice_liste,uint number_departement) returns (bool){
 if ((liste_senat_proportional[number_departement].hasVoted[msg.sender]==false) && (liste_senat_proportional[number_departement].isElecting==true) && (number_departement==citoyens[msg.sender].numberdepartement)){
           liste_senat_proportional[number_departement].electionResults[indice_liste]++;
@@ -219,8 +214,19 @@ function get_senators_after_proportional(uint number_departement){
 //////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////Election président Sénat/////////////////
 
-/// the President of the National Assembly is elected with absolute majority
+/// the President of the Senat  is elected with absolute majority
 /// if we cant reach absolute majority twice, we must use relative majority
+	 struct election_pdSenat
+	{
+		bool isElecting;
+		uint nbCandidates;
+		mapping (address => bool) hasVoted;
+		mapping (uint => address) candidateList;
+    
+		mapping (address => uint256) electionResults;
+	} 
+
+
 election_pdSenat presidentSenat;
 election presidentSenat2;
 
