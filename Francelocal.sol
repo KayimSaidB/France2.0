@@ -1,4 +1,6 @@
 pragma solidity ^0.4.11;
+///local election (regional, departemental can be done with this)
+/// works just like the election of Deputy
 contract SystemeFranceLocal{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
@@ -8,6 +10,8 @@ contract SystemeFranceLocal{
          uint codepostal;
          Roles RoleDuCitoyen;
          uint numerodistrict;
+         uint numberdepartement;
+
      } 
    struct election 
 	{
@@ -34,7 +38,7 @@ function affichage_role(address[]citoyen_){
             
 }
 }
-
+/// we create a mapping with election and the postal code connected
 mapping(uint=>election ) liste_locales_pre_tour;
 mapping(uint=>election ) liste_locales_sec_tour;
 
@@ -46,7 +50,7 @@ function start_a_legi_pre_tour(address[]candidats,uint postal_code){
         liste_locales_pre_tour[postal_code].nbCandidates=candidats.length;
     }
 
-/// when you vote for an election you chose the address of your candidat
+/// when you vote for an election you chose the address of your candidate
 /// and the number district, you can only vote if your own number of district matches
 function vote_for_a_legi_pre_tour(address candidat,uint postal_code) returns (bool){
 if ((liste_locales_pre_tour[postal_code].hasVoted[msg.sender]==false) && (liste_locales_pre_tour[postal_code].isElecting==true) && (postal_code==citoyens[msg.sender].codepostal)){
