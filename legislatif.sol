@@ -1,5 +1,5 @@
 pragma solidity ^0.4.11;
-
+///French election of deputy
 contract SystemeFranceLegislatif{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
@@ -9,6 +9,8 @@ contract SystemeFranceLegislatif{
          uint codepostal;
          Roles RoleDuCitoyen;
          uint numerodistrict;
+        uint numberdepartement;
+
      } 
    struct election 
 	{
@@ -34,7 +36,7 @@ function affichage_role(address[]citoyen_){
             
 }
 }
-
+/// we create a mapping which connect the number of district to an election
 mapping(uint=>election ) liste_legislatives_pre_tour;
 mapping(uint=>election ) liste_legislatives_sec_tour;
 
@@ -58,6 +60,7 @@ if ((liste_legislatives_pre_tour[number_district].hasVoted[msg.sender]==false) &
     
     
 }
+/// get the new deputy of the two which are going to second turn
 function get_the_two_or_the_one_depute(uint number_district)returns(address[2]){
          liste_legislatives_pre_tour[number_district].isElecting=false;
         address winner=liste_legislatives_pre_tour[number_district].candidateList[0];
@@ -164,7 +167,7 @@ function get_Presdepute_normal() returns (address){
     
   }
   
-  /*
+  /* /// if needed
  function start_president_AN2(address[]candidats){
   presidentAN.isElecting=true;
         for(uint i=0;i<candidats.length;i++) presidentAN.candidateList[i]=candidats[i];
