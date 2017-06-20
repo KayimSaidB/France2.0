@@ -1,16 +1,11 @@
 pragma solidity ^0.4.11;
 /// french senator elections
-contract SystemeFranceSenat{
+import "gestionStructure.sol";
+
+contract SystemeFranceSenat is gestionStructure{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
-    enum Roles{Simple_citoyen,PresidentR,Conseiller_local,Depute,PresidentAN,Senateur,PresidentS,Conseiller_constit}
-     
-     struct carac_citoyen{
-         uint codepostal;
-         Roles RoleDuCitoyen;
-         uint numerodistrict;
-         uint numberdepartement;
-     } 
+    
      /// Senators election works by voting for list of candidate
      ///two turn system for departement where we need 1-3 senators
      /// proportional system when it's over 3
@@ -25,14 +20,18 @@ contract SystemeFranceSenat{
 		mapping (uint => uint256) electionResults;
 	} 
 
-mapping(address => carac_citoyen) citoyens;
 event rolecast(address citoyen, Roles sonrole);
 /// vote for the Senat
-function register(uint codepostal,uint numero_district,uint numberdepartement){
+function register(uint codepostal,uint numero_district, uint numberdepartement) returns(bool){
+    if((citoyens[msg.sender].codepostal ==0) &&(citoyens[msg.sender].numerodistrict==0)){
     citoyens[msg.sender].codepostal=codepostal;
     citoyens[msg.sender].numerodistrict=numero_district;
     citoyens[msg.sender].numberdepartement=numberdepartement;
+        return true;
+    }
+    return false;
 }
+    
 
 function affichage_role(address[]citoyen_){
         for (uint256 i;i<citoyen_.length;i++){
