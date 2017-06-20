@@ -1,20 +1,13 @@
 pragma solidity ^0.4.11;
 /// This contract defines the french presidential system of electing 
-contract SystemeFrancePresidentiel{
+import "gestionStructure.sol";
+
+contract SystemeFrancePresidentiel is gestionStructure{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
     // Then he can be a local councillor, a deputy, a senator which for President election is not relevant
     //
-    enum Roles{Simple_citoyen,Conseiller_local,Depute,Senateur,PresidentR,Conseiller_constit}
-     /// When role are defined we can establish the strucuture of a citizen
-     /// with his postal code,Role, number of district and departement
-     struct carac_citoyen{
-         uint codepostal;
-         Roles RoleDuCitoyen;
-         uint numerodistrict;
-        uint numberdepartement;
 
-     } 
      /// the stucture of an election, names of variables are enough explicit
    struct election 
 	{
@@ -24,7 +17,7 @@ contract SystemeFrancePresidentiel{
 		mapping (uint => address) candidateList;
 		mapping (address => uint256) electionResults;
 	} 
-mapping(address => carac_citoyen) citoyens; /// the regisiter of citizen, they have an address connected to citizen characteristics
+ /// the regisiter of citizen, they have an address connected to citizen characteristics
 event rolecast(address citoyen, Roles sonrole);
 ///enables a citizen to register himself with its postal code and its number of district
 /// Maybe a register with all the codepostal linked to the number of district could be useful
