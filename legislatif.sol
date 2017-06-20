@@ -1,17 +1,11 @@
 pragma solidity ^0.4.11;
 ///French election of deputy
-contract SystemeFranceLegislatif{
+import "gestionStructure.sol";
+
+contract SystemeFranceLegislatif is gestionStructure{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
-    enum Roles{Simple_citoyen,PresidentR,Conseiller_local,Depute,PresidentAN,Senateur,PresidentS,Conseiller_constit}
-     
-     struct carac_citoyen{
-         uint codepostal;
-         Roles RoleDuCitoyen;
-         uint numerodistrict;
-        uint numberdepartement;
-
-     } 
+  
    struct election 
 	{
 		bool isElecting;
@@ -20,14 +14,19 @@ contract SystemeFranceLegislatif{
 		mapping (uint => address) candidateList;
 		mapping (address => uint256) electionResults;
 	} 
-mapping(address => carac_citoyen) citoyens;
 event rolecast(address citoyen, Roles sonrole);
 ///enables a citizen to register himself with its postal code and its number of district
 /// Maybe a register with all the codepostal linked to the number of district could be useful
 ///in order to have a more user friendly interface 
-function register(uint codepostal,uint numero_district){
+function register(uint codepostal,uint numero_district) returns(bool){
+    // prevent from register multiple times 
+    if((citoyens[msg.sender].codepostal ==0) &&(citoyens[msg.sender].numerodistrict==0)){
     citoyens[msg.sender].codepostal=codepostal;
     citoyens[msg.sender].numerodistrict=numero_district;
+    
+        return true;
+    }
+    return false;
 }
 function affichage_role(address[]citoyen_){
         for (uint256 i;i<citoyen_.length;i++){
