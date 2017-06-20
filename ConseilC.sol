@@ -1,5 +1,6 @@
 pragma solidity ^0.4.11;
-contract ConseilConstitutionnel{
+import "gestionStructure.sol";
+contract ConseilConstitutionnel is gestionStructure{
 struct un_conseil{
     
     address[]conseil_constitutionnel;
@@ -8,16 +9,6 @@ struct un_conseil{
     
 }
 un_conseil le_conseil;
-enum Roles{Simple_citoyen,PresidentR,Conseiller_local,Depute,PresidentAN,Senateur,PresidentS,Conseiller_constit}
-     
-     struct carac_citoyen{
-         uint codepostal;
-         Roles RoleDuCitoyen;
-         uint numerodistrict;
-      uint numberdepartement;
-
-     } 
-     mapping(address => carac_citoyen) citoyens;
 
 function send_three(address[3]proposals) returns (bool){
     if (((citoyens[msg.sender].RoleDuCitoyen==Roles.PresidentR)&& (le_conseil.hasElected[msg.sender]==false)) || ((citoyens[msg.sender].RoleDuCitoyen==Roles.PresidentAN)&& (le_conseil.hasElected[msg.sender]==false)) || ((citoyens[msg.sender].RoleDuCitoyen==Roles.PresidentS)&& (le_conseil.hasElected[msg.sender]==false)))
