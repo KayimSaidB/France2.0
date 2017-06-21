@@ -54,7 +54,7 @@ if ((liste_legislatives_pre_tour[number_district].hasVoted[msg.sender]==false) &
     
 }
 /// get the new deputy of the two which are going to second turn
-function get_the_two_or_the_one_depute(uint number_district)returns(address[2]){
+function set_the_two_or_the_one_depute(uint number_district)returns(address[2]){
          liste_legislatives_pre_tour[number_district].isElecting=false;
         address winner=liste_legislatives_pre_tour[number_district].candidateList[0];
         address second=liste_legislatives_pre_tour[number_district].candidateList[1];
@@ -100,7 +100,7 @@ function vote_for_secondtour_legi(address candidat,uint number_district) returns
     return false;
 }
 
-function get_depute_after_second_tour(uint number_district){
+function set_depute_after_second_tour(uint number_district){
     address winner;
     liste_legislatives_sec_tour[number_district].isElecting=false;
     if(liste_legislatives_sec_tour[number_district].electionResults[liste_legislatives_sec_tour[number_district].candidateList[0]]>liste_legislatives_sec_tour[number_district].electionResults[liste_legislatives_sec_tour[number_district].candidateList[1]]){
@@ -143,7 +143,7 @@ function voteforPresidentAN(address candidat) returns (bool){
     return false ; /// could be intersting to indicate the voter why it failed
 }
 /// gives us the new president of the National Assembly
-function get_Presdepute_normal() returns (address){
+function set_Presdepute_normal() returns (address){
       address winner=presidentAN.candidateList[0];
         uint256 compteur=presidentAN.electionResults[winner];
         presidentAN.isElecting=true;
@@ -183,7 +183,7 @@ function voteforPresidentAN2(address candidat) returns (bool){
     return false ; /// could be intersting to indicate the voter why it failed
 }
 /// gives us the new president of the National Assembly
-function get_Presdepute_normal2() returns (address){
+function set_Presdepute_normal2() returns (address){
       address winner=presidentAN.candidateList[0];
         uint256 compteur=presidentAN.electionResults[winner];
         presidentAN.isElecting=true;
