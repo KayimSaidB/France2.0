@@ -10,30 +10,31 @@ contract SystemeFranceSenat is gestionStructure{
      ///two turn system for departement where we need 1-3 senators
      /// proportional system when it's over 3
      /// first structure is for two turn election 
-   struct election 
+   struct election_liste_senat
 	{
 		bool isElecting;
 		uint nbCandidates;
 		mapping (address => bool) hasVoted;
 		mapping (uint => address[3]) candidateList; /// we set at three but if we want less senators we have to modify here
-    
+        
 		mapping (uint => uint256) electionResults;
 	} 
 
 event rolecast(address citoyen, Roles sonrole);
 /// vote for the Senat
-function register(uint codepostal,uint numero_district, uint numberdepartement) returns(bool){
+function register(uint codepostal,uint numero_district, uint numberdepartement,bytes32 nom) returns(bool){
     if((citoyens[msg.sender].codepostal ==0) &&(citoyens[msg.sender].numerodistrict==0)){
     citoyens[msg.sender].codepostal=codepostal;
     citoyens[msg.sender].numerodistrict=numero_district;
     citoyens[msg.sender].numberdepartement=numberdepartement;
+     citoyens[msg.sender].name=nom;
         return true;
     }
     return false;
 }
     
 
-function affichage_role(address[]citoyen_){
+function show_roles(address[]citoyen_){
         for (uint256 i;i<citoyen_.length;i++){
             Roles petit=citoyens[citoyen_[i]].RoleDuCitoyen;
             rolecast(citoyen_[i],petit);
@@ -43,8 +44,11 @@ function affichage_role(address[]citoyen_){
 // each county has a list of Senators 
 // so we create a mapping which links the number of Senators needed 
 /// and the number of a county
-mapping (uint=>election) liste_senat_pre_tour;
-mapping (uint=>election) liste_senat_sec_tour;
+mapping (uint=>election_liste_senat) liste_senat_pre_tour;
+mapping (uint=>election_liste_senat) liste_senat_sec_tour;
+//a register of all senators
+mapping(uint=>address) register_senator;
+
 //number of a county linked to each election case we have to elect a senator in two turn
 // if the number of adresses is under 3 we need to fill every list with 0x0
 //or modify this part
@@ -74,7 +78,7 @@ if ((liste_senat_pre_tour[number_departement].hasVoted[msg.sender]==false) && (l
     
 }
 
-function get_the_two_or_the_one_list(uint number_departement)returns(address[3][2]){
+function give_the_two_or_the_one_list(uint number_departement)returns(address[3][2]){
          liste_senat_pre_tour[number_departement].isElecting=false;
         address[3] winner=liste_senat_pre_tour[number_departement].candidateList[0];
         address [3]second=liste_senat_pre_tour[number_departement].candidateList[1];
@@ -99,6 +103,8 @@ function get_the_two_or_the_one_list(uint number_departement)returns(address[3][
         
  if (liste_senat_pre_tour[number_departement].electionResults[indicewinner]>compteur/2){ 
      for (uint j=0;j<winner.length;j++)citoyens[winner[j]].RoleDuCitoyen=Roles.Senateur;
+         
+         
      
     vainqueur[0]=winner;
     return vainqueur;
@@ -130,7 +136,7 @@ if ((liste_senat_sec_tour[number_departement].hasVoted[msg.sender]==false) && (l
 }
 
 ///setting sentors 
-function get_senators_after_second_tour(uint number_departement){
+function set_senators_after_second_tour(uint number_departement){
     address [3] memory winner;
     liste_senat_sec_tour[number_departement].isElecting=false;
     if(liste_senat_sec_tour[number_departement].electionResults[0]>liste_senat_sec_tour[number_departement].electionResults[1]){
@@ -188,7 +194,7 @@ if ((liste_senat_proportional[number_departement].hasVoted[msg.sender]==false) &
     
     
 }
-function get_senators_after_proportional(uint number_departement){
+function set_senators_after_proportional(uint number_departement){
        uint nombresenateur=liste_senat_proportional[number_departement].nbcandidatesbylist;
     while(nombresenateur>0){
         uint senateurwinner=0;
@@ -215,18 +221,9 @@ function get_senators_after_proportional(uint number_departement){
 
 /// the President of the Senat  is elected with absolute majority
 /// if we cant reach absolute majority twice, we must use relative majority
-	 struct election_pdSenat
-	{
-		bool isElecting;
-		uint nbCandidates;
-		mapping (address => bool) hasVoted;
-		mapping (uint => address) candidateList;
-    
-		mapping (address => uint256) electionResults;
-	} 
 
 
-election_pdSenat presidentSenat;
+election presidentSenat;
 election presidentSenat2;
 
 
@@ -247,7 +244,7 @@ function voteforpresidentSenat(address candidat) returns (bool){
     return false ; /// could be intersting to indicate the voter why it failed
 }
 /// gives us the new president of the National Assembly
-function get_PresSenateur_normal() returns (address){
+function set_PresSenateur_normal() returns (address){
       address winner=presidentSenat.candidateList[0];
         uint256 compteur=presidentSenat.electionResults[winner];
         presidentSenat.isElecting=true;
