@@ -9,14 +9,7 @@ contract SystemeFrancePresidentiel is gestionStructure{
     //
 
      /// the stucture of an election, names of variables are enough explicit
-   struct election 
-	{
-		bool isElecting;
-		uint nbCandidates;
-		mapping (address => bool) hasVoted;
-		mapping (uint => address) candidateList;
-		mapping (address => uint256) electionResults;
-	} 
+ 
  /// the regisiter of citizen, they have an address connected to citizen characteristics
 event rolecast(address citoyen, Roles sonrole);
 ///enables a citizen to register himself with its postal code and its number of district
@@ -28,7 +21,7 @@ function register(uint codepostal,uint numero_district){
 }
 /// enables to see roles of a list of citizens 
 
-function affichage_role(address[]citoyen_){
+function show_role(address[]citoyen_){
         for (uint256 i;i<citoyen_.length;i++){
             Roles petit=citoyens[citoyen_[i]].RoleDuCitoyen;
             rolecast(citoyen_[i],petit);
@@ -65,7 +58,7 @@ function vote_for_premiertour(address candidat) returns (bool){ // returns if vo
 
 
 // ends presidential election and set the new president or the two going to second turn
-function get_the_two_or_the_one_president()returns(address[2]){
+function set_the_two_or_the_one_president()returns(address[2]){
          presi_pre_tour.isElecting=false;
         address winner=presi_pre_tour.candidateList[0];
         address second=presi_pre_tour.candidateList[1];
@@ -108,7 +101,7 @@ function vote_for_secondtour(address candidat) returns (bool){
     return false;
 }
 
-function get_president_after_second_tour(){
+function set_president_after_second_tour(){
     address winner;
         presi_sec_tour.isElecting=false;
         if(presi_sec_tour.electionResults[presi_sec_tour.candidateList[0]]>presi_pre_tour.electionResults[presi_sec_tour.candidateList[1]]){
