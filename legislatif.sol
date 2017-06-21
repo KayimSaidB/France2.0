@@ -1,28 +1,21 @@
 pragma solidity ^0.4.11;
-///French election of deputy
+///French election of deputy (congressman)
 import "gestionStructure.sol";
 
 contract SystemeFranceLegislatif is gestionStructure{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
   
-   struct election 
-	{
-		bool isElecting;
-		uint nbCandidates;
-		mapping (address => bool) hasVoted;
-		mapping (uint => address) candidateList;
-		mapping (address => uint256) electionResults;
-	} 
 event rolecast(address citoyen, Roles sonrole);
 ///enables a citizen to register himself with its postal code and its number of district
 /// Maybe a register with all the codepostal linked to the number of district could be useful
 ///in order to have a more user friendly interface 
-function register(uint codepostal,uint numero_district) returns(bool){
+function register(uint codepostal,uint numero_district,bytes32 nom) returns(bool){
     // prevent from register multiple times 
     if((citoyens[msg.sender].codepostal ==0) &&(citoyens[msg.sender].numerodistrict==0)){
     citoyens[msg.sender].codepostal=codepostal;
     citoyens[msg.sender].numerodistrict=numero_district;
+     citoyens[msg.sender].name=nom;
     
         return true;
     }
@@ -38,7 +31,8 @@ function affichage_role(address[]citoyen_){
 /// we create a mapping which connect the number of district to an election
 mapping(uint=>election ) liste_legislatives_pre_tour;
 mapping(uint=>election ) liste_legislatives_sec_tour;
-
+/// a mapping of all deputy
+mapping(uint=>address) register_deputy;
 // each election is represented by its number of district from 1 to 577
 /// for one district 
 function start_a_legi_pre_tour(address[]candidats,uint number_district){
@@ -81,6 +75,7 @@ function get_the_two_or_the_one_depute(uint number_district)returns(address[2]){
         
  if (liste_legislatives_pre_tour[number_district].electionResults[winner]>compteur/2){ 
      citoyens[winner].RoleDuCitoyen=Roles.Depute;
+     register_deputy[number_district]=winner;
     vainqueur[0]=winner;
     return vainqueur;
     
@@ -115,8 +110,12 @@ function get_depute_after_second_tour(uint number_district){
     
     
 citoyens[winner].RoleDuCitoyen=Roles.Depute;
+register_deputy[number_district]=winner;
 
     
+}
+function get_my_deputy( uint number_district) returns (address){
+    return register_deputy[number_district];
 }
 //////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////Election président Assemblée Nationale/////////////////
