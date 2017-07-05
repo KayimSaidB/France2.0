@@ -1,5 +1,5 @@
 pragma solidity ^0.4.11;
-import "browser/senat.sol";
+import "./senat.sol";
 contract ConseilConstitutionnel is SystemeFranceSenat{
 struct un_conseil{
     
