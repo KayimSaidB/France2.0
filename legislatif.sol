@@ -1,8 +1,8 @@
 pragma solidity ^0.4.11;
 ///French election of deputy (congressman)
-import "gestionStructure.sol";
+import "browser/presidential.sol";
 
-contract SystemeFranceLegislatif is gestionStructure{
+contract SystemeFranceLegislatif is SystemeFrancePresidentiel{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
   
@@ -10,17 +10,7 @@ event rolecast(address citoyen, Roles sonrole);
 ///enables a citizen to register himself with its postal code and its number of district
 /// Maybe a register with all the codepostal linked to the number of district could be useful
 ///in order to have a more user friendly interface 
-function register(uint codepostal,uint numero_district,bytes32 nom) returns(bool){
-    // prevent from register multiple times 
-    if((citoyens[msg.sender].codepostal ==0) &&(citoyens[msg.sender].numerodistrict==0)){
-    citoyens[msg.sender].codepostal=codepostal;
-    citoyens[msg.sender].numerodistrict=numero_district;
-     citoyens[msg.sender].name=nom;
-    
-        return true;
-    }
-    return false;
-}
+
 function affichage_role(address[]citoyen_){
         for (uint256 i;i<citoyen_.length;i++){
             Roles petit=citoyens[citoyen_[i]].RoleDuCitoyen;
@@ -34,7 +24,11 @@ mapping(uint=>election ) liste_legislatives_sec_tour;
 /// a mapping of all deputy
 mapping(uint=>address) register_deputy;
 // each election is represented by its number of district from 1 to 577
-/// for one district 
+/// for one district
+mapping(bytes32 => address[])registre_parti; /// links the name of a party to all memebers
+mapping(bytes32 => bytes32[]) registre_groupe_politique; // links the name of a political group to all the party inside
+
+
 function start_a_legi_pre_tour(address[]candidats,uint number_district){
         liste_legislatives_pre_tour[number_district].isElecting=true;
         for(uint i=0;i<candidats.length;i++) liste_legislatives_pre_tour[number_district].candidateList[i]=candidats[i];
@@ -77,6 +71,8 @@ function set_the_two_or_the_one_depute(uint number_district)returns(address[2]){
      citoyens[winner].RoleDuCitoyen=Roles.Depute;
      register_deputy[number_district]=winner;
     vainqueur[0]=winner;
+    registre_parti[citoyens[winner].PartiPolitique].push(winner);
+    
     return vainqueur;
     
  }
@@ -111,12 +107,22 @@ function set_depute_after_second_tour(uint number_district){
     
 citoyens[winner].RoleDuCitoyen=Roles.Depute;
 register_deputy[number_district]=winner;
+  registre_parti[citoyens[winner].PartiPolitique].push(winner);
+
 
     
 }
 function get_my_deputy( uint number_district) returns (address){
     return register_deputy[number_district];
 }
+function join_political_group(bytes32 groupe_politique, bytes32 parti){
+    registre_groupe_politique[groupe_politique].push(parti);
+}
+function get_number_siege(bytes32 parti_politique) returns (uint){
+    
+    return registre_parti[parti_politique].length;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////Election président Assemblée Nationale/////////////////
 
