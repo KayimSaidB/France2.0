@@ -1,6 +1,6 @@
 pragma solidity ^0.4.11;
 /// This contract defines the french presidential system of electing 
-import "browser/gestionStructure.sol";
+import "./gestionStructure.sol";
 
 contract SystemeFrancePresidentiel is gestionStructure{
     /// We start by defining citizens by an adress 
