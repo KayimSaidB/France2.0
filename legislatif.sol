@@ -1,6 +1,6 @@
 pragma solidity ^0.4.11;
 ///French election of deputy (congressman)
-import "browser/presidential.sol";
+import "./presidential.sol";
 
 contract SystemeFranceLegislatif is SystemeFrancePresidentiel{
     /// We start by defining citizens by an adress 
