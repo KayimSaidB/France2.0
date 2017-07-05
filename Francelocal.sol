@@ -1,8 +1,8 @@
 pragma solidity ^0.4.11;
 ///local election (regional, departemental can be done with this)
 /// works just like the election of Deputy
-import "gestionStructure.sol";
-contract SystemeFranceLocal is gestionStructure{
+import "browser/legislatif.sol";
+contract SystemeFranceLocal is SystemeFranceLegislatif{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
 
@@ -13,17 +13,8 @@ event rolecast(address citoyen, Roles sonrole);
 ///enables a citizen to register himself with its postal code and its number of district
 /// Maybe a register with all the codepostal linked to the number of district could be useful
 ///in order to have a more user friendly interface 
-function register(uint codepostal,uint numero_district, uint numberdepartement,bytes32 nom) returns(bool){
-    if((citoyens[msg.sender].codepostal ==0) &&(citoyens[msg.sender].numerodistrict==0)){
-    citoyens[msg.sender].codepostal=codepostal;
-    citoyens[msg.sender].numerodistrict=numero_district;
-    citoyens[msg.sender].numberdepartement=numberdepartement;
-    citoyens[msg.sender].name=nom;
-        return true;
-    }
-    return false;
-}
-  
+mapping(bytes32 => address[])registre_parti;
+
 function show_role(address[]citoyen_){
         for (uint256 i;i<citoyen_.length;i++){
             Roles petit=citoyens[citoyen_[i]].RoleDuCitoyen;
@@ -79,6 +70,7 @@ function set_the_two_or_the_one_conseiller(uint postal_code)returns(address[2]){
  if (liste_locales_pre_tour[postal_code].electionResults[winner]>compteur/2){ 
      citoyens[winner].RoleDuCitoyen=Roles.Conseiller_local;
       register_lcl[postal_code]=winner;
+    registre_parti[citoyens[winner].PartiPolitique].push(winner);
 
     vainqueur[0]=winner;
     return vainqueur;
@@ -115,6 +107,7 @@ function set_conseiller_lcl_after_second_tour(uint postal_code){
     
 citoyens[winner].RoleDuCitoyen=Roles.Conseiller_local;
 register_lcl[postal_code]=winner;
+registre_parti[citoyens[winner].PartiPolitique].push(winner);
 
     
 }
