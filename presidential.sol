@@ -1,6 +1,6 @@
 pragma solidity ^0.4.11;
 /// This contract defines the french presidential system of electing 
-import "gestionStructure.sol";
+import "browser/gestionStructure.sol";
 
 contract SystemeFrancePresidentiel is gestionStructure{
     /// We start by defining citizens by an adress 
@@ -15,10 +15,7 @@ event rolecast(address citoyen, Roles sonrole);
 ///enables a citizen to register himself with its postal code and its number of district
 /// Maybe a register with all the codepostal linked to the number of district could be useful
 ///in order to have a more user friendly interface 
-function register(uint codepostal,uint numero_district){
-    citoyens[msg.sender].codepostal=codepostal;
-    citoyens[msg.sender].numerodistrict=numero_district;
-}
+
 /// enables to see roles of a list of citizens 
 
 function show_role(address[]citoyen_){
@@ -114,9 +111,14 @@ citoyens[winner].RoleDuCitoyen=Roles.PresidentR;
 
     
 }
-
-
-    
+struct un_referendum 
+	{
+		bool isElecting;
+		mapping (address => bool) hasVoted;
+		uint [2] Proposition;
+		mapping (address => uint256) electionResults;
+	} 
+	
     
     
 }
