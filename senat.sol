@@ -1,8 +1,8 @@
 pragma solidity ^0.4.11;
 /// french senator elections
-import "gestionStructure.sol";
+import "browser/Francelocal.sol";
 
-contract SystemeFranceSenat is gestionStructure{
+contract SystemeFranceSenat is SystemeFranceLocal{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
     
@@ -22,16 +22,7 @@ contract SystemeFranceSenat is gestionStructure{
 
 event rolecast(address citoyen, Roles sonrole);
 /// vote for the Senat
-function register(uint codepostal,uint numero_district, uint numberdepartement,bytes32 nom) returns(bool){
-    if((citoyens[msg.sender].codepostal ==0) &&(citoyens[msg.sender].numerodistrict==0)){
-    citoyens[msg.sender].codepostal=codepostal;
-    citoyens[msg.sender].numerodistrict=numero_district;
-    citoyens[msg.sender].numberdepartement=numberdepartement;
-     citoyens[msg.sender].name=nom;
-        return true;
-    }
-    return false;
-}
+
     
 
 function show_roles(address[]citoyen_){
@@ -47,11 +38,14 @@ function show_roles(address[]citoyen_){
 mapping (uint=>election_liste_senat) liste_senat_pre_tour;
 mapping (uint=>election_liste_senat) liste_senat_sec_tour;
 //a register of all senators
-mapping(uint=>address) register_senator;
+mapping(uint=>address[]) register_senator;
+mapping(bytes32 => address[])registre_parti;
+mapping(bytes32 => bytes32[]) registre_groupe_politique;
 
 //number of a county linked to each election case we have to elect a senator in two turn
 // if the number of adresses is under 3 we need to fill every list with 0x0
 //or modify this part
+
 function start_a_senat_pre_tour(address[3][]candidats,uint number_departement){
         liste_senat_pre_tour[number_departement].isElecting=true;
         for(uint i=0;i<candidats.length;i++) liste_senat_pre_tour[number_departement].candidateList[i]=candidats[i];
@@ -102,10 +96,11 @@ function give_the_two_or_the_one_list(uint number_departement)returns(address[3]
         }
         
  if (liste_senat_pre_tour[number_departement].electionResults[indicewinner]>compteur/2){ 
-     for (uint j=0;j<winner.length;j++)citoyens[winner[j]].RoleDuCitoyen=Roles.Senateur;
+     for (uint j=0;j<winner.length;j++){citoyens[winner[j]].RoleDuCitoyen=Roles.Senateur;
          
-         
-     
+    registre_parti[citoyens[winner[j]].PartiPolitique].push(winner[j]);
+    register_senator[number_departement].push(winner[j]);
+     }
     vainqueur[0]=winner;
     return vainqueur;
     
@@ -144,8 +139,10 @@ function set_senators_after_second_tour(uint number_departement){
     }
     else winner=liste_senat_sec_tour[number_departement].candidateList[1];
     
-       for (uint j=0;j<winner.length;j++)citoyens[winner[j]].RoleDuCitoyen=Roles.Senateur;
-
+       for (uint j=0;j<winner.length;j++){citoyens[winner[j]].RoleDuCitoyen=Roles.Senateur;
+       registre_parti[citoyens[winner[j]].PartiPolitique].push(winner[j]);
+       register_senator[number_departement].push(winner[j]);
+}
     
 }
 /// the case of proportional election 
@@ -210,10 +207,18 @@ function set_senators_after_proportional(uint number_departement){
         liste_senat_proportional[number_departement].electionResults[senateurwinner]=liste_senat_proportional[number_departement].electionResults[senateurwinner]/nbdepute_previsonnel;
 
         citoyens[nouveausenateur].RoleDuCitoyen=Roles.Senateur;
-        
+        registre_parti[citoyens[nouveausenateur].PartiPolitique].push(nouveausenateur);
+        register_senator[number_departement].push(nouveausenateur);
     }    
     
     
+}
+function join_political_group(bytes32 groupe_politique, bytes32 parti){
+    registre_groupe_politique[groupe_politique].push(parti);
+}
+function get_number_siege(bytes32 parti_politique) returns (uint){
+    
+    return registre_parti[parti_politique].length;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
