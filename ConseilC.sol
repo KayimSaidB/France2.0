@@ -1,6 +1,6 @@
 pragma solidity ^0.4.11;
-import "gestionStructure.sol";
-contract ConseilConstitutionnel is gestionStructure{
+import "browser/senat.sol";
+contract ConseilConstitutionnel is SystemeFranceSenat{
 struct un_conseil{
     
     address[]conseil_constitutionnel;
