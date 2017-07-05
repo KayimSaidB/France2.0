@@ -1,7 +1,7 @@
 pragma solidity ^0.4.11;
 ///local election (regional, departemental can be done with this)
 /// works just like the election of Deputy
-import "browser/legislatif.sol";
+import "./legislatif.sol";
 contract SystemeFranceLocal is SystemeFranceLegislatif{
     /// We start by defining citizens by an adress 
     // and what we call a role by default a citizen is a normal citizen
